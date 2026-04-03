@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate PhotoBooth Pro ✨</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6b6b">
+    
+    <!-- Icons -->
+    <link rel="icon" href="assets/icons/icon-192.png">
+    
+    <!-- CDN Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js for 3D -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <!-- TensorFlow.js for ML Filters -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    
+    <!-- QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader">
+            <i class="fas fa-camera fa-spin"></i>
+            <h2>Initializing DSLR...</h2>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Recognition Indicator -->
+    <div id="voice-indicator" class="voice-indicator hidden">
+        <i class="fas fa-microphone"></i>
+        <span>Listening...</span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Header with Multi-Language -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <i class="fas fa-camera-retro dslr-icon"></i>
+                    <span id="app-title">Ultimate PhotoBooth</span>
+                </div>
+                <div class="lang-selector">
+                    <select id="language-select">
+                        <option value="id">🇮🇩 ID</option>
+                        <option value="en">🇺🇸 EN</option>
+                        <option value="es">🇪🇸 ES</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Live Stats -->
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span id="live-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-images"></i>
+                    <span id="photo-count">0</span>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-light"></span>
+                    <span id="status-text">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Camera Area with AR/3D -->
+        <div class="camera-area">
+            <!-- Video/Canvas -->
+            <div class="video-container">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="canvas"></canvas>
+                
+                <!-- AR/3D Overlay -->
+                <div id="ar-overlay" class="ar-overlay"></div>
+                
+                <!-- Frame Overlay -->
+                <img id="frame-img" class="frame-overlay hidden" src="assets/frames/frame1.png">
+                
+                <!-- Filters Overlay -->
+                <div id="filter-overlay" class="filter-overlay hidden"></div>
+            </div>
+
+            <!-- HUD Elements -->
+            <div class="hud">
+                <div id="countdown-hud" class="countdown-hud hidden">
+                    <div class="countdown-circle">
+                        <span id="countdown-text">3</span>
+                    </div>
+                </div>
+                
+                <!-- Battery/Voice -->
+                <div class="hud-bottom">
+                    <div id="battery-indicator" class="battery">
+                        <i class="fas fa-battery-full"></i>
+                        <span>100%</span>
+                    </div>
+                    <div id="voice-hud" class="voice-hud">
+                        <i class="fas fa-microphone-slash"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Controls -->
+        <div class="controls-main">
+            <!-- Primary Capture -->
+            <div class="capture-section">
+                <button id="capture-btn" class="capture-btn">
+                    <div class="capture-ring">
+                        <i class="fas fa-circle capture-dot"></i>
+                    </div>
+                    <span id="capture-text">SHOOT</span>
+                </button>
+            </div>
+
+            <!-- Quick Controls -->
+            <div class="quick-controls">
+                <button id="template-btn" class="quick-btn active" data-template="0">
+                    <i class="fas fa-frame"></i>
+                </button>
+                <button id="filter-btn" class="quick-btn" data-filter="0">
+                    <i class="fas fa-magic"></i>
+                </button>
+                <button id="props-btn" class="quick-btn" data-props="0">
+                    <i class="fas fa-hat-wizard"></i>
+                </button>
+                <button id="voice-btn" class="quick-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Post-Capture Screen -->
+        <div id="post-capture" class="post-capture-screen hidden">
+            <canvas id="post-canvas" class="post-canvas"></canvas>
+            <div class="post-actions">
+                <button id="print-btn" class="action-btn primary">
+                    <i class="fas fa-print"></i>
+                    <span id="print-text">PRINT</span>
+                </button>
+                <button id="share-qr-btn" class="action-btn">
+                    <i class="fas fa-qrcode"></i>
+                    <span id="qr-text">QR SHARE</span>
+                </button>
+                <button id="gallery-btn" class="action-btn">
+                    <i class="fas fa-images"></i>
+                    <span id="gallery-text">GALLERY</span>
+                </button>
+                <button id="new-photo-btn" class="action-btn secondary">
+                    <i class="fas fa-redo"></i>
+                    <span id="new-text">NEW SHOT</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div id="gallery-modal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="gallery-title">📸 Gallery</h2>
+                <button id="close-gallery" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="gallery-content" class="gallery-content"></div>
+        </div>
+    </div>
+
+    <!-- QR Modal -->
+    <div id="qr-modal" class="modal-overlay hidden">
+        <div class="modal-container qr-modal">
+            <h3 id="qr-title">📱 Scan to Download</h3>
+            <div id="qr-container"></div>
+            <div class="qr-actions">
+                <button id="copy-link-btn" class="qr-btn">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+                <button id="whatsapp-btn" class="qr-btn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Trigger -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <div class="admin-content">
+            <h3>🔧 Admin Panel</h3>
+            <button id="admin-login">Admin Login</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="shutter-sound" preload="auto"></audio>
+    <audio id="countdown-sound" preload="auto"></audio>
+    <audio id="success-sound" preload="auto"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
