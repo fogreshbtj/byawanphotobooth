@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhotoBooth Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- WELCOME -->
+<div id="welcome" class="screen active">
+  <h1>📸 PhotoBooth</h1>
+  <button id="startBtn">Tap to Start</button>
+</div>
+
+<!-- FRAME -->
+<div id="frameScreen" class="screen">
+  <h2>Pilih Frame</h2>
+  <div class="frames">
+    <img src="https://via.placeholder.com/150/ff6b6b" class="frame active">
+    <img src="https://via.placeholder.com/150/4ecdc4" class="frame">
+    <img src="https://via.placeholder.com/150/ffe66d" class="frame">
+  </div>
+  <button id="frameNext">Start Session</button>
+</div>
+
+<!-- CAMERA -->
+<div id="cameraScreen" class="screen">
+  <video id="video" autoplay playsinline></video>
+  <div id="countdown">3</div>
+</div>
+
+<!-- FILTER -->
+<div id="filterScreen" class="screen">
+  <h2>Pilih Filter</h2>
+  <canvas id="canvas"></canvas>
+
+  <div class="filters">
+    <button data-filter="none">Normal</button>
+    <button data-filter="grayscale(1)">B&W</button>
+    <button data-filter="sepia(1)">Vintage</button>
+    <button data-filter="contrast(1.5)">Bright</button>
+  </div>
+
+  <button id="toPreview">Lanjut</button>
+</div>
+
+<!-- RESULT -->
+<div id="resultScreen" class="screen">
+  <canvas id="finalCanvas"></canvas>
+
+  <div class="actions">
+    <button id="downloadBtn">Download</button>
+    <button id="finishBtn">Selesai</button>
+  </div>
+</div>
+
+<!-- END -->
+<div id="endScreen" class="screen">
+  <h2>Terima Kasih 🙏</h2>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
