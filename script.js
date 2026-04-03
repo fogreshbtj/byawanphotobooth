@@ -289,3 +289,4 @@ class UltimatePhotoBooth {
         document.addEventListener('touchstart', e => touchStart = e.touches[0].clientX);
         document
     }
+}
